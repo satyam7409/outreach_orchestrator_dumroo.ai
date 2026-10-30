@@ -1,8 +1,7 @@
 """
-Script 1: prepare the NCES CCD *Directory* files (schools + districts).
+prepare the NCES CCD *Directory* files (schools + districts).
 
-Input  (same folder): ccd_lea_029_2425_*  and  ccd_sch_029_2425_*   (.csv or .xlsx)
-Output: prepared/nj_districts.csv, prepared/nj_schools.csv
+
 
 Keeps New Jersey only, drops closed/inactive records, keeps the columns the
 app needs, and keeps IDs and ZIP codes as zero-padded text.
