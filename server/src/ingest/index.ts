@@ -1,12 +1,11 @@
-import { prisma } from "../db.js";
+import { prisma } from "../config/db.js";
 import path from "node:path";
 import { buildIngestData } from "./transform.js";
 
 const BATCH = 1000;
 const dryRun = process.argv.includes("--dry-run");
 
-const dataDir =
-  process.env.DATA_DIR ?? path.resolve(process.cwd(), "src/data");
+const dataDir = process.env.DATA_DIR ?? path.resolve(process.cwd(), "src/data");
 
 function chunks<T>(items: T[], size: number): T[][] {
   const out: T[][] = [];
