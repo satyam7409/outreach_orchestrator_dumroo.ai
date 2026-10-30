@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum LeadRole {
+  PRINCIPAL
+  DISTRICT_ADMIN
+}
+
+enum LeadStatus {
+  PENDING
+  PROCESSING
+  SENT
+  FAILED
+}
+
+enum CampaignStatus {
+  RUNNING
+  COMPLETED
+}
+
+model District {
+  leaid       String   @id
+  name        String
+  city        String?
+  zip         String?
+  phone       String?
+  website     String?
+  leaType     String?
+  schoolCount Int?
+  enrollment  Int?
+  createdAt   DateTime @default(now())
+
+  schools School[]
+  leads   Lead[]
+}
+
+model School {
+  ncessch    String   @id
+  districtId String
+  district   District @relation(fields: [districtId], references: [leaid])
+  name       String
+  city       String?
+  zip        String?
+  phone      String?
+  website    String?
+  schoolType String?
+  level      String?
+  gradeLow   String?
+  gradeHigh  String?
+  isCharter  Boolean  @default(false)
+  enrollment Int?
+  createdAt  DateTime @default(now())
+
+  leads Lead[]
+
+  @@index([districtId])
+}
+
+model Campaign {
+  id          String         @id @default(cuid())
+  status      CampaignStatus @default(RUNNING)
+  totalLeads  Int
+  startedAt   DateTime       @default(now())
+  completedAt DateTime?
+
+  leads Lead[]
+}
+
+model Lead {
+  id        String   @id @default(cuid())
+  sourceKey String   @unique
+  role      LeadRole
+
+  adminName  String
+  adminEmail String
+  phone      String? // real organisation phone from NCES
+
+  districtId String
+  district   District @relation(fields: [districtId], references: [leaid])
+  schoolId   String? // null for DISTRICT_ADMIN
+  school     School?  @relation(fields: [schoolId], references: [ncessch])
+
+  status       LeadStatus @default(PENDING)
+  attempts     Int        @default(0)
+  errorMessage String?
+  emailSubject String?
+  emailBody    String?    @db.Text
+  processedAt  DateTime?
+
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+  @@index([campaignId])
+  @@index([role])
+}
