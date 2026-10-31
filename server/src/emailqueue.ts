@@ -7,10 +7,10 @@ export const emailQueue = new Queue("send-email", {
   defaultJobOptions: {
     attempts: 5,
 
+    // The worker's custom strategy respects Groq's retry-after value
+    // for 429 responses and uses exponential backoff for other transient errors.
     backoff: {
-      type: "exponential",
-      delay: 15000,
-      jitter: 0.5,
+      type: "custom",
     },
 
     removeOnComplete: {
