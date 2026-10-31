@@ -103,14 +103,23 @@ Return valid JSON with exactly these fields:
           type: "json_object",
         },
       }),
+      signal: AbortSignal.timeout(30_000),
     },
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
 
-    throw new Error(`Groq API error ${response.status}: ${errorText}`);
-  }
+ if (!response.ok) {
+  const error = new Error(
+    `Groq API error: ${response.status} ${response.statusText}`
+  );
+
+  Object.assign(error, {
+    status: response.status,
+    retryAfter: response.headers.get("retry-after"),
+  });
+
+  throw error;
+}
 
   const result = (await response.json()) as GroqResponse;
 
