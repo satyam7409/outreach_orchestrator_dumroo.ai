@@ -1,0 +1,9 @@
+export const leadStatuses = ["PENDING", "PROCESSING", "SENT", "FAILED"] as const;
+export type Notice = { type: "success" | "error"; text: string };
+export type StartCampaignResponse = { campaignId: string; total: number; batches: number };
+export type LeadStatus = (typeof leadStatuses)[number];
+export type Lead = { id: string; role: string; adminName: string; adminEmail: string; status: LeadStatus; school: { name: string; enrollment: number | null } | null; district: { name: string; enrollment: number | null } };
+export type Stats = { leads: { total: number; pending: number; processing: number; sent: number; failed: number }; campaigns: Campaign[] };
+export type Campaign = { id: string; status: "RUNNING" | "COMPLETED"; totalLeads: number; startedAt: string; completedAt: string | null };
+export type CampaignDetails = Campaign & { counts: { pending: number; processing: number; sent: number; failed: number }; progress: number };
+export type LeadsResponse = { items: Lead[]; page: number; pageSize: number; total: number; totalPages: number };
