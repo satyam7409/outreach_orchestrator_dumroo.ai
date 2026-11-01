@@ -250,15 +250,7 @@ The start endpoint returns HTTP `202 Accepted`: the work has been queued, not co
 - The campaign service allows one running campaign at a time.
 - The dashboard lead list fetches data on page/search/status changes; it does not currently poll each lead row continuously.
 
-## Demo / video walkthrough checklist
 
-1. Show the four prepared New Jersey CSVs and explain the NCES directory and enrollment preparation.
-2. Show the District, School, Lead, and Campaign tables in Supabase/PostgreSQL.
-3. Start Redis, the Express API, and the BullMQ worker in separate terminals.
-4. Open the dashboard and show the lead table and lead status totals.
-5. Start a small campaign (e.g. five leads).
-6. Show worker logs, Groq draft generation, and simulated email output.
-7. Show updated lead statuses and generated email subject/body in PostgreSQL.
 
 ---
 
