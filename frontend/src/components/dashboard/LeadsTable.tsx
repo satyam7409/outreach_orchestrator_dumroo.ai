@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useLeads } from "../../hooks/useLeads";
 import { leadStatuses, type LeadStatus } from "../../types";
+import type { Lead } from "../../types";
+import { EmailDraftModal } from "./EmailDraftModal";
 
-const headings = ["Administrator", "Role", "School", "District", "Email", "Enrollment", "Status"];
+const headings = ["Administrator", "Role", "School", "District", "Email", "Enrollment", "Status", "Email Draft"];
 
 export function LeadsTable() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<LeadStatus | "ALL">("ALL");
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const { data, error, loading } = useLeads(page, search, status);
 
   const changeStatus = (nextStatus: LeadStatus | "ALL") => {
@@ -55,9 +58,9 @@ export function LeadsTable() {
           </thead>
           <tbody>
             {error ? (
-              <tr><td colSpan={7}><div className="empty"><strong>{error}</strong></div></td></tr>
+              <tr><td colSpan={8}><div className="empty"><strong>{error}</strong></div></td></tr>
             ) : loading ? (
-              <tr><td colSpan={7}><div className="empty">Loading leads...</div></td></tr>
+              <tr><td colSpan={8}><div className="empty">Loading leads...</div></td></tr>
             ) : data?.items.length ? (
               data.items.map((lead) => (
                 <tr key={lead.id}>
@@ -67,11 +70,14 @@ export function LeadsTable() {
                   <td>{lead.district.name}</td>
                   <td>{lead.adminEmail}</td>
                   <td>{lead.school?.enrollment ?? lead.district.enrollment ?? "-"}</td>
-                  <td>{lead.status}</td>
+                  <td><span className={`lead-status ${lead.status.toLowerCase()}`}>{lead.status}</span></td>
+                  <td>
+                    {lead.status === "SENT" ? <button className="draft-link" onClick={() => setSelectedLead(lead)}>View Draft</button> : lead.status === "FAILED" ? <span className="draft-unavailable">Generation failed</span> : <span className="draft-unavailable">Not generated</span>}
+                  </td>
                 </tr>
               ))
             ) : (
-              <tr><td colSpan={7}><div className="empty">No leads match the current filters.</div></td></tr>
+              <tr><td colSpan={8}><div className="empty">No leads match the current filters.</div></td></tr>
             )}
           </tbody>
         </table>
@@ -84,6 +90,7 @@ export function LeadsTable() {
           <button disabled={page >= data.totalPages} onClick={() => setPage(page + 1)}>Next</button>
         </div>
       )}
+      {selectedLead && <EmailDraftModal lead={selectedLead} onClose={() => setSelectedLead(null)} />}
     </section>
   );
 }

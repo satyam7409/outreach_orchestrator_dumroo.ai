@@ -25,7 +25,10 @@ export function useDashboard() {
 
   useEffect(() => {
     const activeCampaign = stats?.campaigns.find((item) => item.status === "RUNNING");
-    if (!activeCampaign) return;
+    if (!activeCampaign) {
+      setCampaign(null);
+      return;
+    }
 
     let cancelled = false;
     const poll = async () => {
@@ -34,6 +37,7 @@ export function useDashboard() {
         if (cancelled) return;
         setCampaign(nextCampaign);
         if (nextCampaign.status === "COMPLETED") {
+          setCampaign(null);
           await refresh();
         }
       } catch (cause) {

@@ -7,3 +7,4 @@ export type Stats = { leads: { total: number; pending: number; processing: numbe
 export type Campaign = { id: string; status: "RUNNING" | "COMPLETED"; totalLeads: number; startedAt: string; completedAt: string | null };
 export type CampaignDetails = Campaign & { counts: { pending: number; processing: number; sent: number; failed: number }; progress: number };
 export type LeadsResponse = { items: Lead[]; page: number; pageSize: number; total: number; totalPages: number };
+export type EmailDraft = { recipient: { name: string; email: string }; schoolName: string | null; districtName: string; status: LeadStatus; subject: string; body: string };

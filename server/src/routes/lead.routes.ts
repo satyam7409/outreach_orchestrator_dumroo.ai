@@ -3,6 +3,44 @@ import { prisma } from "../config/db.js";
 
 export const leadRouter = Router();
 
+leadRouter.get("/:leadId/draft", async (req, res, next) => {
+  try {
+    const lead = await prisma.lead.findUnique({
+      where: { id: req.params.leadId },
+      select: {
+        adminName: true,
+        adminEmail: true,
+        status: true,
+        emailSubject: true,
+        emailBody: true,
+        school: { select: { name: true } },
+        district: { select: { name: true } },
+      },
+    });
+
+    if (!lead) {
+      res.status(404).json({ error: "Lead not found" });
+      return;
+    }
+
+    if (!lead.emailSubject || !lead.emailBody) {
+      res.status(409).json({ error: "An email draft has not been generated for this lead yet" });
+      return;
+    }
+
+    res.json({
+      recipient: { name: lead.adminName, email: lead.adminEmail },
+      schoolName: lead.school?.name ?? null,
+      districtName: lead.district.name,
+      status: lead.status,
+      subject: lead.emailSubject,
+      body: lead.emailBody,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 leadRouter.get("/", async (req, res, next) => {
   try {
     const page = Math.max(1, Number(req.query.page) || 1);
