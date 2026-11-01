@@ -12,14 +12,7 @@ export const emailQueue = new Queue("send-email", {
       delay: 15000,
       jitter: 0.5,
     },
-
-    removeOnComplete: {
-      age: 3600,
-      count: 1000,
-    },
-
-    removeOnFail: {
-      age: 7 * 24 * 3600,
-    },
+    removeOnComplete: true,
+    removeOnFail: true,
   },
 });

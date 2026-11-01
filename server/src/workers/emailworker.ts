@@ -1,7 +1,11 @@
+
 import { Worker } from "bullmq";
 import { redis } from "../config/redis.js";
 
-import { processEmail, type EmailJobData } from "./emailProcessor.js";
+import {
+  processEmail,
+  type EmailJobData,
+} from "./emailProcessor.js";
 
 const emailWorker = new Worker<EmailJobData>(
   "send-email",
@@ -12,26 +16,26 @@ const emailWorker = new Worker<EmailJobData>(
     concurrency: 1,
 
     limiter: {
-      max: 4,
+      max: 5,
       duration: 60_000,
     },
-  }
+  },
 );
 
 emailWorker.on("ready", () => {
-  console.log("Email worker connected to Redis and listening for jobs.");
+  console.log("Batch email worker connected to Redis.");
 });
 
 emailWorker.on("active", (job) => {
-  console.log(`Job ${job.id} started`);
+  console.log(`Batch job ${job.id} started`);
 });
 
 emailWorker.on("completed", (job) => {
-  console.log(`Job ${job.id} completed successfully`);
+  console.log(`Batch job ${job.id} completed`);
 });
 
 emailWorker.on("failed", (job, error) => {
-  console.error(`Job ${job?.id} failed: ${error.message}`);
+  console.error(`Batch job ${job?.id} failed: ${error.message}`);
 });
 
 emailWorker.on("error", (error) => {

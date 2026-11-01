@@ -125,3 +125,50 @@ export async function completeCampaignIfFinished(
 
   return true;
 }
+
+
+
+export async function getLeadsWithContext(leadIds: string[]) {
+  return prisma.lead.findMany({
+    where: {
+      id: { in: leadIds },
+    },
+    include: {
+      district: true,
+      school: true,
+    },
+  });
+}
+
+export async function releaseLeadsForRetry(leadIds: string[]) {
+  if (leadIds.length === 0) return;
+
+  await prisma.lead.updateMany({
+    where: {
+      id: { in: leadIds },
+      status: "PROCESSING",
+    },
+    data: {
+      status: "PENDING",
+    },
+  });
+}
+
+export async function markLeadsFailed(
+  leadIds: string[],
+  errorMessage: string,
+) {
+  if (leadIds.length === 0) return;
+
+  await prisma.lead.updateMany({
+    where: {
+      id: { in: leadIds },
+      status: "PROCESSING",
+    },
+    data: {
+      status: "FAILED",
+      errorMessage,
+      processedAt: new Date(),
+    },
+  });
+}
